@@ -1,110 +1,275 @@
-# AWS Authentication PWSH Version 🚀
+# AWS Authentication PWSH 🚀
 
-## Overview
+[![PowerShell](https://img.shields.io/badge/PowerShell-7.x+-blue.svg?logo=powershell&logoColor=white)](https://github.com/PowerShell/PowerShell)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-❤-ff69b4?logo=github-sponsors)](https://github.com/sponsors/karimz1)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-Welcome to the AWS Authentication Scripts repository\! This project contains powerful and modular PowerShell scripts designed to **streamline and automate the authentication process** for key AWS services like **CodeArtifact** (for NuGet tokens) and **ECR** (for Docker credentials).
+> **Streamline AWS authentication** for CodeArtifact (NuGet) and Amazon ECR (Docker) with powerful, cross-platform PowerShell automation scripts featuring integrated AWS SSO support.
 
-These scripts feature integrated **AWS SSO (Single Sign-On) support** and detailed logging for easy auditing and troubleshooting.
+---
 
------
+## 📋 Table of Contents
 
-## Features
+- [Overview](#-overview)
+- [Features](#-features)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Quick Start](#-quick-start)
+- [Usage](#-usage)
+  - [Refresh NuGet Tokens](#1-refresh-nuget-tokens-for-aws-codeartifact)
+  - [Authenticate Docker with ECR](#2-authenticate-docker-with-aws-ecr)
+- [Automation](#-automate-session-refresh)
+- [IAM Permissions](#-iam-permissions)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-  * ✅ **CodeArtifact:** Authenticate and refresh NuGet tokens for AWS CodeArtifact repositories.
-  * ✅ **ECR:** Authenticate Docker with AWS ECR to push and pull images.
-  * 🔑 **SSO Management:** Includes an `-SSO` switch to easily force an AWS SSO login when your session expires.
-  * 🌐 **Portability:** Cross-platform compatible (Windows, macOS, and Linux) using PowerShell Core.
+---
 
------
+## 🎯 Overview
 
-## Prerequisites
+This repository provides enterprise-ready PowerShell scripts designed to **automate and simplify AWS authentication** for critical development workflows. Whether you're working with AWS CodeArtifact for NuGet package management or Amazon ECR for Docker container registries, these scripts handle the complexity of token refresh and credential management.
 
-Before running the scripts, ensure you have the following installed and configured:
+**Key Benefits:**
+- ⚡ **Automated token refresh** - Never manually refresh NuGet or Docker credentials again
+- 🔐 **AWS SSO integration** - Seamlessly work with AWS Single Sign-On profiles
+- 🌐 **Cross-platform** - Works on Windows, macOS, and Linux via PowerShell Core
+- 📝 **Detailed logging** - Comprehensive logs for auditing and troubleshooting
+- 🔧 **Modular design** - Reusable modules for AWS CLI helpers and logging
 
-  * **AWS CLI v2:** Installed and configured, typically utilizing an **SSO Profile** for authentication. Refer to the [AWS CLI Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html).
-  * **Docker:** Installed and running (required for ECR authentication).
-  * **PowerShell Core (7.x+):** Installed as the execution environment.
-  * **Access:** Proper IAM permissions for CodeArtifact (`codeartifact:*`) and ECR (`ecr:*`) services.
+---
 
------
+## ✨ Features
 
-## Usage
+- ✅ **AWS CodeArtifact Authentication** - Automatically refresh NuGet tokens for your CodeArtifact repositories
+- ✅ **Amazon ECR Authentication** - Log Docker into ECR registries with a single command
+- 🔑 **SSO Management** - Built-in `-SSO` switch to force AWS SSO login when sessions expire
+- 🌍 **Region Flexibility** - Configure fallback regions or use detected AWS CLI settings
+- 📊 **Debug Mode** - Verbose output and detailed logging for troubleshooting
+- 🚀 **Automation Ready** - Easily integrate with cron jobs, Task Scheduler, or CI/CD pipelines
 
-All scripts should be executed from PowerShell Core (`pwsh`). Use the `-SSO` switch whenever your session is expired or you need to ensure a fresh login.
+---
 
-### 1\. Refresh NuGet Tokens for AWS CodeArtifact
+## 📦 Prerequisites
 
-This script logs into your AWS CodeArtifact domain and updates your NuGet configuration with fresh authentication tokens.
+Before using these scripts, ensure you have the following installed and configured:
 
-  * **Script:** `refreshNugetToken.ps1`
+| Requirement | Description | Installation Guide |
+|------------|-------------|-------------------|
+| **AWS CLI v2** | Required for AWS authentication and SSO | [Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) |
+| **PowerShell Core 7.x+** | Cross-platform PowerShell execution environment | [Installation Guide](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell) |
+| **Docker** | Required for ECR authentication (Docker daemon must be running) | [Get Docker](https://docs.docker.com/get-docker/) |
+| **AWS SSO Profile** | Configured SSO profile in your AWS CLI | [SSO Configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html) |
+
+**IAM Permissions:**
+- CodeArtifact: `codeartifact:*` permissions
+- ECR: `ecr:*` permissions
+- See [Required IAM Roles](Required%20IAM%20Roles.md) for minimal security-focused permissions
+
+---
+
+## 💿 Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/karimz1/AWS-Authentication-PWSH.git
+   cd AWS-Authentication-PWSH
+   ```
+
+2. **Verify PowerShell Core installation:**
+   ```bash
+   pwsh --version
+   ```
+
+3. **Verify AWS CLI configuration:**
+   ```bash
+   aws configure list
+   aws sso login --profile <your-sso-profile>
+   ```
+
+4. **Make scripts executable (Linux/macOS):**
+   ```bash
+   chmod +x *.ps1
+   ```
+
+---
+
+## 🚀 Quick Start
+
+**Refresh NuGet tokens and Docker credentials in one go:**
+
+```powershell
+# First time or when session expires
+pwsh ./refreshNugetToken.ps1 -SSO
+pwsh ./refreshEcrDockerToken.ps1 -SSO
+
+# Subsequent runs with active session
+pwsh ./refreshNugetToken.ps1
+pwsh ./refreshEcrDockerToken.ps1
+```
+
+**That's it!** Your NuGet and Docker credentials are now refreshed and ready to use.
+
+---
+
+## 📖 Usage
+
+All scripts should be executed from PowerShell Core (`pwsh`). Use the `-SSO` switch when your AWS session expires or you need to force a fresh login.
+
+### 1. Refresh NuGet Tokens for AWS CodeArtifact
+
+Authenticates with your AWS CodeArtifact domain and updates your NuGet configuration with fresh authentication tokens.
+
+**Script:** `refreshNugetToken.ps1`
 
 | Command | Purpose |
-| :--- | :--- |
-| `.\refreshNugetToken.ps1` | **Standard Run.** Uses the existing AWS session/profile. |
-| `.\refreshNugetToken.ps1 -SSO` | **Force Login.** Executes `aws sso login` before refreshing tokens. **Use this when your session expires.** |
-| `.\refreshNugetToken.ps1 -RegionFallback "region"` | Specify a fallback region if the AWS CLI region is not configured (e.g., `"eu-west-1"`). |
-| `.\refreshNugetToken.ps1 -DEBUG $true` | Enable debug mode for verbose output and detailed logs. |
+|:--------|:--------|
+| `./refreshNugetToken.ps1` | **Standard Run** - Uses existing AWS session/profile |
+| `./refreshNugetToken.ps1 -SSO` | **Force Login** - Executes `aws sso login` before refreshing tokens. Use when session expires |
+| `./refreshNugetToken.ps1 -RegionFallback "eu-west-1"` | Specify fallback region if AWS CLI region is not configured |
+| `./refreshNugetToken.ps1 -DEBUG $true` | Enable debug mode for verbose output and detailed logs |
 
------
+**Example:**
+```powershell
+# Force SSO login and refresh tokens with debug output
+pwsh ./refreshNugetToken.ps1 -SSO -DEBUG $true
+```
 
-### 2\. Authenticate Docker with AWS ECR
+---
 
-This script retrieves a temporary authentication token from ECR and logs your local Docker client into the registry.
+### 2. Authenticate Docker with AWS ECR
 
-  * **Script:** `refreshEcrDockerToken.ps1`
+Retrieves a temporary authentication token from Amazon ECR and logs your local Docker client into the registry.
+
+**Script:** `refreshEcrDockerToken.ps1`
 
 | Command | Purpose |
-| :--- | :--- |
-| `.\refreshEcrDockerToken.ps1` | **Standard Run.** Uses the existing AWS session/profile. |
-| `.\refreshEcrDockerToken.ps1 -SSO` | **Force Login.** Executes `aws sso login` before fetching ECR credentials. **Use this when your session expires.** |
-| `.\refreshEcrDockerToken.ps1 -RegionFallback "region"` | Specify a fallback region (e.g., `"us-east-1"`). |
-| `.\refreshEcrDockerToken.ps1 -AccountId 123456789012` | Provide the 12-digit AWS Account ID directly, skipping the `sts:GetCallerIdentity` check. |
+|:--------|:--------|
+| `./refreshEcrDockerToken.ps1` | **Standard Run** - Uses existing AWS session/profile |
+| `./refreshEcrDockerToken.ps1 -SSO` | **Force Login** - Executes `aws sso login` before fetching ECR credentials. Use when session expires |
+| `./refreshEcrDockerToken.ps1 -RegionFallback "us-east-1"` | Specify fallback region (e.g., `us-east-1`) |
+| `./refreshEcrDockerToken.ps1 -AccountId 123456789012` | Provide the 12-digit AWS Account ID directly, skipping `sts:GetCallerIdentity` |
 
------
+**Example:**
+```powershell
+# Refresh ECR credentials for a specific account and region
+pwsh ./refreshEcrDockerToken.ps1 -SSO -AccountId 123456789012 -RegionFallback "us-west-2"
+```
 
-## Automate Session Refresh ⏰
+---
 
-To maintain continuous access without manual intervention, integrate these scripts into your system's scheduling tools.
+## ⏰ Automate Session Refresh
 
-### Cron Job Example (Linux/macOS)
+Maintain continuous access without manual intervention by integrating these scripts into your system's scheduling tools.
 
-This runs the scripts every time the system reboots, ensuring a fresh session at startup.
+### 🐧 Cron Job (Linux/macOS)
 
-1.  Open your crontab configuration:
+Run scripts automatically at system startup to ensure fresh sessions.
 
-    ```sh
-    crontab -e
-    ```
+1. **Open crontab editor:**
+   ```bash
+   crontab -e
+   ```
 
-2.  Add the following lines (adjust the path and ensure the `-SSO` flag is included if the session needs to be forced):
+2. **Add the following lines** (adjust paths to match your setup):
+   ```bash
+   # Refresh AWS tokens at system startup/reboot
+   @reboot pwsh /path/to/AWS-Authentication-PWSH/refreshNugetToken.ps1 -SSO
+   @reboot pwsh /path/to/AWS-Authentication-PWSH/refreshEcrDockerToken.ps1 -SSO
+   ```
 
-    ```sh
-    # Run at system startup/reboot
-    @reboot pwsh /path/to/the/repository/refreshNugetToken.ps1 -SSO
-    @reboot pwsh /path/to/the/repository/refreshEcrDockerToken.ps1 -SSO
-    ```
+### 🪟 Task Scheduler (Windows)
 
-### Task Scheduler Example (Windows)
+Use Windows Task Scheduler to run scripts automatically at user login.
 
-Use Task Scheduler to run the scripts automatically at user login.
+1. **Open Task Scheduler** and create a new task
+2. **Set Trigger:** "At log on"
+3. **Set Action:** "Start a program"
 
-1.  Open Task Scheduler and create a new task with a **Trigger** set to **At log on**.
+| Script | Program/script | Add arguments |
+|:-------|:---------------|:--------------|
+| **NuGet** | `pwsh` | `-NoProfile -File "C:\path\to\AWS-Authentication-PWSH\refreshNugetToken.ps1" -SSO` |
+| **ECR** | `pwsh` | `-NoProfile -File "C:\path\to\AWS-Authentication-PWSH\refreshEcrDockerToken.ps1" -SSO` |
 
-2.  Set the **Action** to **Start a program** with the following details:
+---
 
-    | Script | Program/script | Add arguments (optional) |
-    | :--- | :--- | :--- |
-    | **NuGet** | `pwsh` | `-NoProfile -File "C:\path\to\repository\refreshNugetToken.ps1" -SSO` |
-    | **ECR** | `pwsh` | `-NoProfile -File "C:\path\to\repository\refreshEcrDockerToken.ps1" -SSO` |
+## 🔐 IAM Permissions
 
------
+For detailed IAM roles and minimal security-focused permissions, see:
 
-## Contribution & License
+📄 **[Required IAM Roles Documentation](Required%20IAM%20Roles.md)**
 
-## License
+This document includes JSON policy examples for:
+- CodeArtifact domain listing and authentication
+- ECR pull permissions and authorization tokens
+- STS caller identity verification
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+---
 
-## Contributing
+## 🔧 Troubleshooting
 
-Hi, I'm Karim Zouine, the developer of these scripts. Contributions are very welcome\! If you have suggestions, improvements, or bug fixes, please open an issue or submit a pull request. Let's make this project even better together\!
+### Common Issues
+
+**❌ "aws sso login failed"**
+- Ensure your SSO profile is correctly configured: `aws configure sso`
+- Check your SSO start URL and region settings
+
+**❌ "Docker daemon is not running"**
+- Start Docker Desktop or Docker service
+- Verify with: `docker info`
+
+**❌ "Unable to locate credentials"**
+- Run with `-SSO` flag to force fresh login
+- Verify AWS CLI configuration: `aws configure list`
+
+**❌ "Region not configured"**
+- Use `-RegionFallback` parameter to specify a region
+- Configure default region: `aws configure set region us-east-1`
+
+### Debug Mode
+
+Enable detailed logging for troubleshooting:
+```powershell
+pwsh ./refreshNugetToken.ps1 -DEBUG $true
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are very welcome! Whether you have bug fixes, feature ideas, or documentation improvements, I'd love to collaborate.
+
+**How to contribute:**
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 💖 Support
+
+If you find these scripts helpful, consider:
+- ⭐ **Starring this repository** to help others discover it
+- 💬 **Sharing feedback** through issues or discussions
+- 💝 **[Sponsoring on GitHub](https://github.com/sponsors/karimz1)** to support continued development
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [Karim Zouine](https://github.com/karimz1)**
+
+[Report Bug](https://github.com/karimz1/AWS-Authentication-PWSH/issues) · [Request Feature](https://github.com/karimz1/AWS-Authentication-PWSH/issues) · [Discussions](https://github.com/karimz1/AWS-Authentication-PWSH/discussions)
+
+</div>
