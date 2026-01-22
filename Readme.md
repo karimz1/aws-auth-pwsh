@@ -30,12 +30,16 @@ To use these scripts, you must have the official **AWS CLI v2** installed and co
 
 ## Quick Start
 
+How to use it.
+
+
+
 For local development using AWS SSO, include the `-SSO` flag to trigger the browser-based login. If you use static IAM credentials (Access Key and Secret Key) already configured in your AWS profile, you may omit this flag.
 
-```bash
-# Authenticate and refresh NuGet and ECR tokens
-pwsh ./refreshNugetToken.ps1 -SSO
-pwsh ./refreshEcrDockerToken.ps1 -SSO
+``` bash
+git clone https://github.com/karimz1/aws-auth-pwsh.git    
+pwsh ./aws-auth-pwsh/refreshNugetToken.ps1 -SSO # auth nuget using code artifact
+pwsh ./aws-auth-pwsh/refreshEcrDockerToken.ps1 -SSO # auth docker using ecr
 ```
 
 ------
@@ -66,7 +70,7 @@ jobs:
           
       - name: Refresh NuGet tokens from CodeArtifact
         run: |
-          git clone https://github.com/karimz1/AWS-Authentication-Scripts.git    
+          git clone https://github.com/karimz1/aws-auth-pwsh.git
           ./AWS-Authentication-Scripts/refreshNugetToken.ps1
 ```
 
