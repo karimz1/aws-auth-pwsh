@@ -71,7 +71,7 @@ jobs:
       - name: Refresh NuGet tokens from CodeArtifact
         run: |
           git clone https://github.com/karimz1/aws-auth-pwsh.git
-          ./AWS-Authentication-Scripts/refreshNugetToken.ps1
+          ./aws-auth-pwsh/refreshNugetToken.ps1
 ```
 
 I regularly update the scripts if something breaks, so you can just git clone the repo. **The script filenames will never change for consistency.** I use these scripts in my personal projects as well, so this repo is the single source of truth.
